@@ -30,14 +30,15 @@ function checkJobSuccess {
 
     # track if the job succeeds running. Exit immediately with a failed LSF job
     sleep 20
-    success=$(bhist -l ${jobPrev} | grep  "Done successfully")
+    success=$(grep "Successfully completed" Myjob.${jobPrev}.log)
+    #success=$(bhist -l ${jobPrev} | grep  "Done successfully")
     echo ${success}
     if [ -z "${success}" ]; then
 	exit 1;
     fi
 }
 
-if [ 2 -eq 1 ];then {
+
 #0 premutect steps suggested by TCGA tumor only pipeline
 perl -pe 's#DATA_PATH#$ENV{data_path}#g;s#PROJECT#$ENV{project}#g;s#SUBJECT#$ENV{subject}#g;s#TEST_SAMPLE#$ENV{sample}#g' run_premutect_process.sh | bsub -J premutect_${project}_${subject}_${sample}
 jobId=$(bjobs -J premutect_${project}_${subject}_${sample} | awk '{print $1}' | grep -v JOBID)
@@ -63,8 +64,6 @@ jobName=rmsnp_${project}_${subject}_${sample}
 message="Removing Germline SNPs/INDELs going......."
 checkJobSuccess
 
-}
-fi
 
 #3. VEP Annotation, extra manual filtration and variant classification by type
 perl -pe 's/DATA_PATH/$ENV{data_path}/g;s/PROJECT/$ENV{project}/g;s/SUBJECT/$ENV{subject}/g;s/TEST_SAMPLE/$ENV{sample}/g' run_VEP_annotation_hg38_tumor_only_AF_0.05.sh | bsub -J VEP_${project}_${subject}_${sample}
