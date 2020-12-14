@@ -5,10 +5,10 @@
 ###############################
 #parameters
 ###############################
-data_path=$1;export data_path
-project=$2;export project
-subject=$3;export subject
-sample=$4;export sample
+data_path=$1
+project=$2
+subject=$3
+sample=$4
 #readGroup=$5;export readGroup # e.g. H2JFYBBXY.5
 jobId=""
 jobName=""
@@ -40,7 +40,9 @@ function checkJobSuccess {
 
 
 #0 premutect steps suggested by TCGA tumor only pipeline
+export data_path project subject sample
 perl -pe 's#DATA_PATH#$ENV{data_path}#g;s#PROJECT#$ENV{project}#g;s#SUBJECT#$ENV{subject}#g;s#TEST_SAMPLE#$ENV{sample}#g' run_premutect_process.sh | bsub -J premutect_${project}_${subject}_${sample}
+unset data_path project subject sample
 jobId=$(bjobs -J premutect_${project}_${subject}_${sample} | awk '{print $1}' | grep -v JOBID)
 jobName=premutect_${project}_${subject}_${sample}
 message="Pre Mutect2 processing going......"
@@ -49,7 +51,9 @@ sleep 30
 
 
 #1. Mutect2 Calling and Filtration
+export data_path project subject sample
 perl -pe 's/DATA_PATH/$ENV{data_path}/g;s/PROJECT/$ENV{project}/g;s/SUBJECT/$ENV{subject}/g;s/TEST_SAMPLE/$ENV{sample}/g' run_mutect2_and_Filter_tumor_only.sh | bsub -J mutect_${project}_${subject}_${sample}
+unset data_path project subject sample
 jobId=$(bjobs -J mutect_${project}_${subject}_${sample} | awk '{print $1}' | grep -v JOBID)
 jobName=mutect_${project}_${subject}_${sample}
 message="Mutect2 calling and filtration going......"
@@ -58,7 +62,9 @@ sleep 30
 
 
 #2. Remove the Germline dbsnp variants for hg38
+export data_path project subject sample
 perl -pe 's/DATA_PATH/$ENV{data_path}/g;s/PROJECT/$ENV{project}/g;s/SUBJECT/$ENV{subject}/g;s/TEST_SAMPLE/$ENV{sample}/g' run_remove_hg38_germline_dbsnp.sh | bsub -J rmsnp_${project}_${subject}_${sample}
+unset data_path project subject sample
 jobId=$(bjobs -J rmsnp_${project}_${subject}_${sample} | awk '{print $1}' | grep -v JOBID)
 jobName=rmsnp_${project}_${subject}_${sample}
 message="Removing Germline SNPs/INDELs going......."
@@ -66,7 +72,9 @@ checkJobSuccess
 
 
 #3. VEP Annotation, extra manual filtration and variant classification by type
+export data_path project subject sample
 perl -pe 's/DATA_PATH/$ENV{data_path}/g;s/PROJECT/$ENV{project}/g;s/SUBJECT/$ENV{subject}/g;s/TEST_SAMPLE/$ENV{sample}/g' run_VEP_annotation_hg38_tumor_only_AF_0.05.sh | bsub -J VEP_${project}_${subject}_${sample}
+unset data_path project subject sample
 jobId=$(bjobs -J VEP_${project}_${subject}_${sample} | awk '{print $1}' | grep -v JOBID)
 jobName=VEP_${project}_${subject}_${sample}
 message="VEP annotation going......."
