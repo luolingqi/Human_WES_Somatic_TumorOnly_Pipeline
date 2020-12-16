@@ -5,7 +5,7 @@
 ###############################
 #parameters
 ###############################
-data_path=$1;export data_path
+data_path=$1
 project=$2
 subject=$3
 sample=$4
@@ -13,8 +13,6 @@ sample=$4
 jobId=""
 jobName=""
 message=""
-
-# function parameters: $1: step name; $2:
 function runSteps () {
     #export data_path project subject sample readGroup
     #perl -pe 's#TEST_SAMPLE#$ENV{sample}#g;s#PROJECT#$ENV{project}#g;s#SUBJECT#$ENV{subject}#g;s#DATA_PATH#$ENV{data_path}#g;s#TRIM##g' run_${1}.sh |bsub -J ${1}_${2}_${3}_${4}
@@ -26,7 +24,6 @@ function runSteps () {
     checkJobSuccess
     sleep 30
 }
-
 
 function checkJobSuccess {
     # track if the job stops running    
@@ -53,48 +50,22 @@ function checkJobSuccess {
     fi
 }
 
-#0. Extract/build readgroup from the sample fastq.gz file
-readGroup=$(gzip -cd ${data_path}/${project}/${subject}/${sample}/*R1_001.fastq.gz | head -1 | cut -d: -f3,4 | perl -pe 's/:/./g')
 
-#1. Fastqc on the raw fastq files
-runSteps fastqc $project $subject $sample $data_path
+#0 premutect steps suggested by TCGA tumor only pipeline
+runSteps premutect_process $project $subject $sample $data_path
 
-#2. Trimgalore to remove adapter and low quality reads
-runSteps trim_galore $project $subject $sample $data_path
-mv ${data_path}/${project}/${subject}/${sample}/trim_galore_output/*trim.fastq.gz ${data_path}/${project}/${subject}/${sample}
-sleep 10
+#1. Mutect2 Calling and Filtration
+runSteps mutect2_and_Filter_tumor_only $project $subject $sample $data_path
 
-#3. Fastqc on the trimmed fastq files
-#runSteps fastqc_trim
+#2. Remove the Germline dbsnp variants for hg38
+runSteps remove_hg38_germline_dbsnp $project $subject $sample $data_path
 
-#4. Convert trimmed fastq to uBAM
-runSteps fastq_to_uBAM $project $subject $sample $data_path
-
-#5. BWA MEM Alignment
-runSteps bwa_mem $project $subject $sample $data_path
-
-#6. Collect Quality Metrics
-#6.1 Qualimap to gather both exome and rnaseq qc metrics
-runSteps qualimap $project $subject $sample $data_path
-
-#6.2 HsMetrics to collect hybrid selection metrics for WES data
-runSteps CollectHsMetrics $project $subject $sample $data_path
-
-#6.3 MultipleMetrics
-runSteps CollectQualityMetrics $project $subject $sample $data_path
-
-#7. MarkDuplicate
-runSteps markduplicate $project $subject $sample $data_path
-
-#   INDELREALIGNER
-runSteps indelrealigner $project $subject $sample $data_path
-#8. Estimate Base Quality
-runSteps BaseRecalibrator $project $subject $sample $data_path
-
-#9. Apply BQSR
-runSteps ApplyBQSR $project $subject $sample $data_path
+#3. VEP Annotation, extra manual filtration and variant classification by type
+runSteps VEP_annotation_hg38_tumor_only_AF_0.05 $project $subject $sample $data_path
 
 # Declare mission completed
 echo "Mission Accomplished!"
+
+
 
 

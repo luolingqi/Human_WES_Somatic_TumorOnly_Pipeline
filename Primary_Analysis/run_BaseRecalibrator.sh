@@ -21,8 +21,8 @@ sample=TEST_SAMPLE
 #data_path="/home/luol2/lingqi_workspace/Projects/Jones_Lee_Exercise_Project"
 data_path=DATA_PATH
 
-input_bam="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bam"
-input_bai="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bai"
+input_bam="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.IndelRealigned.sorted.bam"
+input_bai="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.IndelRealigned.sorted.bai"
 recalibration_report_filename="${data_path}/${project}/${subject}/${sample}/${sample}.recal_data.csv"
 dbSNP_vcf="/data/ldiaz/luol2/gatk_resource_bundle/hg38/dbsnp_146.hg38.vcf.gz"
 #dbMGP_indels_vcf="/home/luol2/lingqi_workspace/References/GRCm38/Mus_musculus/MGP_indels/mgp.v5.indels.pass.sort.vcf.gz"

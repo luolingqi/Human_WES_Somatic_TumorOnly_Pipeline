@@ -16,6 +16,7 @@ project=PROJECT
 subject=SUBJECT
 sample=TEST_SAMPLE
 
+#tumor_bam=${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicates_marked.recalibrated.bam
 tumor_bam=${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicates_marked.recalibrated.bam
 tumor_name=${data_path}/${project}/${subject}/${sample}/tumor_name.txt
 
