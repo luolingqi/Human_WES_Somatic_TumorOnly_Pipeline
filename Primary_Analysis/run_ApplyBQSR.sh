@@ -21,8 +21,8 @@ sample=TEST_SAMPLE
 #data_path="/home/luol2/lingqi_workspace/Projects/Jones_Lee_Exercise_Project"
 data_path=DATA_PATH
 
-input_bam="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bam"
-input_bai="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bai"
+input_bam="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.IndelRealigned.sorted.bam"
+input_bai="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.IndelRealigned.sorted.bai"
 recalibration_report="${data_path}/${project}/${subject}/${sample}/${sample}.recal_data.csv"
 
 output_bam_basename="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicates_marked.recalibrated"

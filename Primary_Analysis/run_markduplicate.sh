@@ -23,8 +23,8 @@ INPUT="${data_path}/${project}/${subject}/${sample}/${sample}.bam"
 OUTPUT="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.unsorted.duplicates_marked"
 METRICS="${data_path}/${project}/${subject}/${sample}/${sample}.duplicate_metrics"
 
-SORT_BAM="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bam"
-SORT_BAI="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bai"
+#SORT_BAM="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bam"
+#SORT_BAI="${data_path}/${project}/${subject}/${sample}/${sample}.aligned.duplicate_marked.sorted.bai"
 
 java -Dsamjdk.compression_level=${compression_level} -Xmx${java_heap_memory_initial} -jar ${tool_path}/picard.jar \
     MarkDuplicates \
@@ -38,7 +38,7 @@ java -Dsamjdk.compression_level=${compression_level} -Xmx${java_heap_memory_init
     ADD_PG_TAG_TO_READS=false
 
 # Sort the deduplicated sam files
-${tool_path}/samtools sort -m ${mem_limit} --threads ${samtools_threads} -l ${compression_level} ${OUTPUT} -o ${SORT_BAM} 
-${tool_path}/samtools index ${SORT_BAM} ${SORT_BAI}
+#${tool_path}/samtools sort -m ${mem_limit} --threads ${samtools_threads} -l ${compression_level} ${OUTPUT} -o ${SORT_BAM} 
+#${tool_path}/samtools index ${SORT_BAM} ${SORT_BAI}
 
 
