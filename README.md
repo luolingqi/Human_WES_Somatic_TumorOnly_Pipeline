@@ -1,4 +1,4 @@
-# Diaz Lab Human Tumor-only WES Somatic Variant Calling Pipeline (SomVaRIUS)
+# Diaz Lab Human Tumor-only WES Somatic Variant Calling Pipeline (Mutect2)
 
 
 This is a version-controlled code repository for **Human Tumor-only Somatic Variant Calling Pipeline** in development by the Diaz group at MSKCC. The pipeline implementation is specific for execution by the members in the **Diaz group only!!!**  
@@ -10,7 +10,7 @@ The entire pipeline consists of two parts: **`Primary Analysis`** and **`Seconda
 
 
 
-> The **`primary analysis`** was built on top of both **GATK Best Practice** for somatic calling and a high performance Tumor-only variant calling algorithm, **SomVaRIUS**. The sample FASTQ files are aligned and called against the GRCh38 reference genome and its relevant resource bundle. The result set of variants are further manually filtered and VEP annotated to reach a clean, well function-annotated set. 
+> The **`primary analysis`** was built on top of both **GATK Best Practice** for somatic calling and a high performance Tumor-only variant calling algorithm, **Mutect2**. The sample FASTQ files are aligned and called against the GRCh38 reference genome and its relevant resource bundle. The result set of variants are further manually filtered and VEP annotated to reach a clean, well function-annotated set. 
 >
 > The **`secondary analysis`** performs downstream summary analysis with the annotated callset. Before its operation, ***RESEARCHERS*** need to *MANUALLY* prepare 3 ***MANIFEST FILES*** to define the analytical scope for 1) `variant comparison by type`; 2) `variant allele frequency (VAF) plot`; 3) `mutation signature`. The template for these manifest files can be found in the tables shown below. A R script summarizes all the secondary analysis outputs and generates a markdown notebook with tables and plots of the final results. 
 	  
@@ -21,7 +21,7 @@ The entire pipeline consists of two parts: **`Primary Analysis`** and **`Seconda
 _________________________
 ### **Primary Lilac Locations for the Pipeline and associated Resource Bundles**
 
-* Top-level Github directory of the pipeline: **_/luolingqi/Human_WES_Somatic_TumorOnly_SomVaRIUS_Pipeline_** w/sub-directories: 
+* Top-level Github directory of the pipeline: **_/luolingqi/Human_WES_Somatic_TumorOnly_Mutect2_Pipeline_** w/sub-directories: 
   - Main pipeline implementation scripts: **_`/Primary`_**
   - Downstream R analysis for variant gain/loss, MAF distribution plots, Mutation signature, etc.: **_`/Seconcary`_**
   
@@ -36,9 +36,9 @@ _________________________
 ### **Primary Scripts & manifest files for Automatic Pipeline Running**
   * `step1_preprocessing_simple.sh` -- it takes fastq file and readgroup info as inputs, and runs the following as listed in the table below
 
-  * `step2_SomVarIUS_VEP_simple.sh` -- it takes the duplicate-removed and BQSR-recalibrated file outputs from `step1_preprocessing_simple.sh`, and runs the following as listed in the table below
+  * `step2_Mutect2_VEP_simple.sh` -- it takes the duplicate-removed and BQSR-recalibrated file outputs from `step1_preprocessing_simple.sh`, and runs the following as listed in the table below
   
-  * `step3_gain_loss_VEP_simple.sh` -- it takes a manifest sample comparison file (as shown in the template table below) and all the well annotated/filtered variant files from `step2_SomVarIUS_VEP_simple.sh`, output the gain/loss for all the pairwise comparisons (e.g. Parental vs Treatment)
+  * `step3_gain_loss_VEP_simple.sh` -- it takes a manifest sample comparison file (as shown in the template table below) and all the well annotated/filtered variant files from `step2_Mutect2_VEP_simple.sh`, output the gain/loss for all the pairwise comparisons (e.g. Parental vs Treatment)
   
   * `step4_MutSig_deconstruction.sh` -- it takes a manifest file (as shown in the template table below) recording vcf files for the individual samples and gain/loss comparisons, deconstruct and plot the mutation signatures
     
@@ -47,7 +47,7 @@ _________________________
 **Table 1. Description of the workflow on the above 4 steps**
 Step1: Data Quality Checking & Preprocessing  |  Step2: Variant Calling, filtering & Annotation | Step3: Variant Gain/Loss Comparison (e.g. Parental v.s. Treated) | Step4: Mutation Signature Deconvolution
 -------------------------------------------   |  ---------------------------------------------- |  --------------------------------------------------------------- | ----------------------------------------
-Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(SomVaRIUS - run_somvarius_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** | Mutation Signature Deconvolution <br/> **(run_deconstructsigshg38.sh)**
+Quality checking of raw fastq files <br/> **(Fastqc - run_fastqc.sh)**  |  Somatic Variant Calling and filtration <br/> **(Mutect2 - run_mutect2_and_Filter_tumor_only.sh)** | Variant Gain/Loss (Parental vs Treated) <br/> **(run_variants_gain_loss_treatment.vs.Parental.AF.0.05.sh)** | Mutation Signature Deconvolution <br/> **(run_deconstructsigshg38.sh)**
 Adapter & low quality reads trimming <br/> **(Trimgalore - run_trim_galore.sh)** |  Removing Germline SNP/INDEL variants <br/> **(For human - run_remove_hg38_germline_dbsnp.sh)**
 Trimmed fastq to uBAM format conversion <br/> **(required by GATK pipeline - run_fastq_to_uBAM.sh)**  |  ENSEMBL VEP variant annotation & type filtration <br/> **(missense, frameshit, nonsynonymous, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
 BWA MEM alignment to GRCh38 <br/> **(BWA MEM - run_bwa_mem.sh)**  |  Extra manual filtrations by quality <br/> **(AD, MBQ, MMQ, MPOS5, etc. - run_VEP_annotation_hg38_tumor_only_AF_0.05.sh)**
@@ -71,7 +71,7 @@ Sample_SW480_COMBO8W_IGO_10212_G_5 | loss | PITT_0522/Sample_SW480_COMBO8W_IGO_1
 Sample_SW480_TMZ8W_IGO_10212_G_3 | loss | PITT_0522/Sample_SW480_TMZ8W_IGO_10212_G_3_vs_Sample_SW480_P8W_IGO_10212_G_2.VEP.ann.AF0.05_BQ20_MQ50.vcf
 Sample_SW480_CDDP8W_IGO_10212_G_4 | gain | PITT_0522/Sample_SW480_P8W_IGO_10212_G_2_vs_Sample_SW480_CDDP8W_IGO_10212_G_4.VEP.ann.AF0.05_BQ20_MQ50.vcf
 Sample_SW480_COMBO8W_IGO_10212_G_5 | gain | PITT_0522/Sample_SW480_P8W_IGO_10212_G_2_vs_Sample_SW480_COMBO8W_IGO_10212_G_5.VEP.ann.AF0.05_BQ20_MQ50.vcf
-Sample_SW480_CDDP8W_IGO_10212_G_4 | total | PITT_0522/Sample_SW480_CDDP8W_IGO_10212_G_4/Sample_SW480_CDDP8W_IGO_10212_G_4.aligned.duplicates_marked.recalibrated.targeted_sequencing.somvarius.tumor_only.sorted.rm_dbsnps.AF0.05_BQ20_MQ50.VEP.ann.vcf
+Sample_SW480_CDDP8W_IGO_10212_G_4 | total | PITT_0522/Sample_SW480_CDDP8W_IGO_10212_G_4/Sample_SW480_CDDP8W_IGO_10212_G_4.aligned.duplicates_marked.recalibrated.targeted_sequencing.mutect2.tumor_only.sorted.rm_dbsnps.AF0.05_BQ20_MQ50.VEP.ann.vcf
 
 _________________________
 ### **Prerequisites for Running the Pipeline**<br/>
@@ -96,7 +96,7 @@ _________________________
 The entire pipeline is split into the following four steps for the sake of efficient debugging and implementation. The operator will need to supervise the successful execution of each step by lauching subsequent one. There is one batch script linked to each of the 4 steps respectively as shown below.  
 
 * step1_preprocessing_simple.sh
-* step2_SomVarIUS_VEP_simple.sh
+* step2_Mutect2_VEP_simple.sh
 * step3_gain_loss_VEP_simple.sh
 * step4_MutSig_deconstruction.sh
 
@@ -117,8 +117,8 @@ Please first copy the above shell scripts into a folder (e.g. data\_analysis) as
   SAMPLE     a sample name, required.                                    e.g. Sample_CT26CDDP_M1_IGO_10212_E_13
   
   
-  # SomVaRIUS calling & VEP annotation
-  nohup sh step2_SomVarIUS_VEP_simple.sh DATA_PATH PROJECT SUBJECT SAMPLE 2>&1 >nohup_step2_SAMPLE.log &
+  # Mutect2 calling & VEP annotation
+  nohup sh step2_Mutect2_VEP_simple.sh DATA_PATH PROJECT SUBJECT SAMPLE 2>&1 >nohup_step2_SAMPLE.log &
   
   .OPTIONS.
   Same as the options in step 1
